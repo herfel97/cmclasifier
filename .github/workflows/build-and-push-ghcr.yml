@@ -11,7 +11,7 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ghcr.io/herfel97/testopenshiftups
+  IMAGE_NAME: ghcr.io/herfel97/cmclasifier
   IMAGE_TAG: ${{ github.sha }}
 
 jobs:
