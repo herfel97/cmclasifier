@@ -18,7 +18,7 @@ spec:
         - name: ghcr-secret
       containers:
         - name: cmclasifierserver
-          image: cmclasifierserver
+          image: cmclasifier
           ports:
             - name: http
               containerPort: 80
