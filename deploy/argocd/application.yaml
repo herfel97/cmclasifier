@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: test
+  namespace: argocd
+spec:
+  project: gihp4c
+  source:
+    repoURL: https://github.com/herfel97/cmclasifier.git
+    targetRevision: HEAD
+    path: deploy/overlays/k3s
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gihp4c
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      name: test
+      namespace: gihp4c
+      jqPathExpressions:
+        - .spec.template.spec.containers[].image
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

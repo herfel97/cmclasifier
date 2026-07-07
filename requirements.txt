@@ -1,0 +1,29 @@
+# Core
+Flask>=1.1.2
+
+# Utilitarios
+Flask-SQLAlchemy>=2.4.4
+# Flask-JWT>=0.3.2
+Flask-Socketio>=5.0.1
+
+## Otros
+# Fasttext
+# https://fasttext.cc/docs/en/support.html
+pandas
+numpy
+#tweepy
+psycopg2-binary
+
+unidecode
+matplotlib==3.5.0
+pydantic==1.8.2
+ibm-watson>=6.0.0
+python-magic==0.4.27
+#python-magic-bin==0.4.14
+relatorio==0.8.1
+transformers==4.18.0
+
+#sudo apt-get install python-psycopg2 libpq-dev
+#sudo apt-get install libreoffice-java-common
+#pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113
+
