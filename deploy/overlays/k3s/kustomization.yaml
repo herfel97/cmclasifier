@@ -8,5 +8,5 @@ resources:
 
 images:
   - name: test
-    newName: ghcr.io/herfel97/cmclasifierserver
-    newTag: ""
+    newName: ghcr.io/herfel97/cmclasifier
+    newTag: "asdasdasdasdasd"
