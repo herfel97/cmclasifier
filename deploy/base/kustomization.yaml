@@ -13,4 +13,4 @@ commonLabels:
 images:
 - name: test
   newName: ghcr.io/herfel97/cmclasifier
-  newTag: 5ec0408ec896ffa9236b17c5a0456fc727c529a1
+  newTag: 1942c184c4b4dda62a80f40876f3d08f8991cfcd
