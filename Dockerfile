@@ -1,31 +1,47 @@
-FROM python:3.10-slim
-
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1 \
-    HF_HOME=/app/.cache/huggingface \
-    TRANSFORMERS_CACHE=/app/.cache/huggingface
+# Stage 1: Build
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        build-essential \
-        libmagic1 \
-        libpq-dev \
-        libreoffice \
-        libreoffice-java-common \
-    && rm -rf /var/lib/apt/lists/*
+# Copiar archivos de dependencias
+COPY package*.json ./
 
-COPY requirements.txt .
+# Instalar dependencias
+RUN npm ci --only=production && \
+    npm cache clean --force
 
-RUN pip install --upgrade pip setuptools wheel \
-    && pip install "Flask<2.3" "Werkzeug<2.3" "SQLAlchemy<1.4" \
-    && pip install -r requirements.txt \
-    && pip install requests PyJWT clean-text sqlalchemy-paginator torch
+# Copiar código fuente
+COPY src ./src
+COPY tsconfig*.json ./
+COPY nest-cli.json ./
 
-COPY . .
+# Compilar la aplicación
+RUN npm run build
 
-EXPOSE 5000
+# Stage 2: Runtime
+FROM node:22-alpine
 
-CMD ["python", "app.py"]
+WORKDIR /app
+
+# Crear usuario no-root para seguridad
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nestjs -u 1001
+
+# Copiar node_modules de la etapa de build
+COPY --from=builder --chown=nestjs:nodejs /app/node_modules ./node_modules
+
+# Copiar el dist compilado
+COPY --from=builder --chown=nestjs:nodejs /app/dist ./dist
+
+# Cambiar al usuario nestjs
+USER nestjs
+
+# Exponer puerto
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD node -e "require('http').get('http://localhost:3000', (res) => { if (res.statusCode !== 200 || res.statusCode === 404) throw new Error('health check failed'); })" || exit 1
+
+# Comando de inicio
+CMD ["node", "dist/main"]
