@@ -22,6 +22,7 @@ COPY prisma ./prisma
 
 # Generar cliente de Prisma
 RUN npx prisma generate
+RUN ls -la node_modules/.prisma/client
 
 # Compilar la aplicación
 RUN npm run build
