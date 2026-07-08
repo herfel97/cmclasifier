@@ -15,6 +15,9 @@ COPY prisma ./prisma
 RUN npm ci --unsafe-perm && \
     npm cache clean --force
 
+# Asegurar que el paquete wasm de prisma esté presente (algunas instalaciones lo omiten)
+RUN npm i @prisma/prisma-schema-wasm@7.8.0 --no-audit --no-fund || true
+
 # Copiar código fuente
 COPY src ./src
 COPY tsconfig*.json ./
