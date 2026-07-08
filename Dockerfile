@@ -1,7 +1,7 @@
 # ==========================
 # Stage 1: Build
 # ==========================
-FROM node:22-bookworm AS builde
+FROM node:22-bookworm AS builder
 
 WORKDIR /app
 
