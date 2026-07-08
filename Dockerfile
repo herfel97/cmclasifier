@@ -8,8 +8,11 @@ WORKDIR /app
 # Copiar archivos de dependencias
 COPY package*.json ./
 
-# Instalar dependencias
-RUN npm ci && \
+# Copiar Prisma antes de la instalación por si algún script de instalación lo necesita
+COPY prisma ./prisma
+
+# Instalar dependencias (asegurar ejecución de postinstall dentro del contenedor)
+RUN npm ci --unsafe-perm && \
     npm cache clean --force
 
 # Copiar código fuente
@@ -17,12 +20,12 @@ COPY src ./src
 COPY tsconfig*.json ./
 COPY nest-cli.json ./
 
-# Copiar Prisma
-COPY prisma ./prisma
+# Asegurar binarios nativos/paquetes de prisma estén reconstruidos (defensa adicional)
+RUN npm rebuild @prisma/client || true
 
 # Generar cliente de Prisma
-RUN npx prisma generate
-RUN ls -la node_modules/.prisma/client
+RUN npx prisma generate --schema=./prisma/schema.prisma
+RUN ls -la node_modules/.prisma/client || true
 
 # Compilar la aplicación
 RUN npm run build
