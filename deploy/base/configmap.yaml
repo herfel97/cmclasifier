@@ -5,6 +5,6 @@ metadata:
   labels:
     app: cmclasifierserver
 data:
-  DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/cmclasifier?schema=public"
+  DATABASE_URL: "postgresql://postgres:postgres@172.16.26.17:5432/cmclasifier?schema=public"
   PORT: "3000"
   NODE_ENV: "production"
