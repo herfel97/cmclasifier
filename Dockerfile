@@ -1,5 +1,7 @@
+# ==========================
 # Stage 1: Build
-FROM node:22-alpine AS builder
+# ==========================
+FROM node:22-bookworm AS builde
 
 WORKDIR /app
 
@@ -15,7 +17,7 @@ COPY src ./src
 COPY tsconfig*.json ./
 COPY nest-cli.json ./
 
-# Copiar schema de Prisma (necesario para generar cliente)
+# Copiar Prisma
 COPY prisma ./prisma
 
 # Generar cliente de Prisma
@@ -24,33 +26,35 @@ RUN npx prisma generate
 # Compilar la aplicación
 RUN npm run build
 
+# ==========================
 # Stage 2: Runtime
-FROM node:22-alpine
+# ==========================
+FROM node:22-bookworm
 
 WORKDIR /app
 
-# Crear usuario no-root para seguridad
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nestjs -u 1001
+# Crear usuario no-root
+RUN groupadd -g 1001 nodejs && \
+    useradd -r -u 1001 -g nodejs nestjs
 
-# Copiar node_modules de la etapa de build
+# Copiar dependencias
 COPY --from=builder --chown=nestjs:nodejs /app/node_modules ./node_modules
 
-# Copiar el dist compilado
+# Copiar aplicación compilada
 COPY --from=builder --chown=nestjs:nodejs /app/dist ./dist
 
-# Copiar schema de Prisma (requerido en runtime)
-COPY --chown=nestjs:nodejs prisma ./prisma
+# Copiar Prisma
+COPY --from=builder --chown=nestjs:nodejs /app/prisma ./prisma
 
-# Cambiar al usuario nestjs
+# Cambiar al usuario no-root
 USER nestjs
 
 # Exponer puerto
 EXPOSE 3000
 
-# Health check
+# Healthcheck
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD node -e "require('http').get('http://localhost:3000', (res) => { if (res.statusCode !== 200 || res.statusCode === 404) throw new Error('health check failed'); })" || exit 1
+    CMD node -e "require('http').get('http://localhost:3000', (res) => { process.exit(res.statusCode === 200 ? 0 : 1); }).on('error', () => process.exit(1));"
 
 # Comando de inicio
 CMD ["node", "dist/main"]
