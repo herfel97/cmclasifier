@@ -15,6 +15,12 @@ COPY src ./src
 COPY tsconfig*.json ./
 COPY nest-cli.json ./
 
+# Copiar schema de Prisma (necesario para generar cliente)
+COPY prisma ./prisma
+
+# Generar cliente de Prisma
+RUN npx prisma generate
+
 # Compilar la aplicación
 RUN npm run build
 
@@ -32,6 +38,9 @@ COPY --from=builder --chown=nestjs:nodejs /app/node_modules ./node_modules
 
 # Copiar el dist compilado
 COPY --from=builder --chown=nestjs:nodejs /app/dist ./dist
+
+# Copiar schema de Prisma (requerido en runtime)
+COPY --chown=nestjs:nodejs prisma ./prisma
 
 # Cambiar al usuario nestjs
 USER nestjs
