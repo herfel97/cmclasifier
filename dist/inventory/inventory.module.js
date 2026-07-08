@@ -10,21 +10,21 @@ exports.InventoryModule = void 0;
 const common_1 = require("@nestjs/common");
 const inventory_controller_1 = require("./inventory.controller");
 const inventory_service_1 = require("../application/inventory.service");
-const prisma_module_1 = require("../infrastructure/prisma/prisma.module");
+const db_module_1 = require("../infrastructure/db/db.module");
 const inventory_constants_1 = require("../application/inventory.constants");
-const inventory_prisma_repository_1 = require("../infrastructure/prisma/inventory-prisma.repository");
+const inventory_pg_repository_1 = require("../infrastructure/db/inventory-pg.repository");
 let InventoryModule = class InventoryModule {
 };
 exports.InventoryModule = InventoryModule;
 exports.InventoryModule = InventoryModule = __decorate([
     (0, common_1.Module)({
-        imports: [prisma_module_1.PrismaModule],
+        imports: [db_module_1.DbModule],
         controllers: [inventory_controller_1.InventoryController],
         providers: [
             inventory_service_1.InventoryService,
             {
                 provide: inventory_constants_1.INVENTORY_REPOSITORY,
-                useClass: inventory_prisma_repository_1.InventoryPrismaRepository,
+                useClass: inventory_pg_repository_1.InventoryPgRepository,
             },
         ],
     })

@@ -1,18 +1,18 @@
 import { Module } from '@nestjs/common';
 import { InventoryController } from './inventory.controller';
 import { InventoryService } from '../application/inventory.service';
-import { PrismaModule } from '../infrastructure/prisma/prisma.module';
+import { DbModule } from '../infrastructure/db/db.module';
 import { INVENTORY_REPOSITORY } from '../application/inventory.constants';
-import { InventoryPrismaRepository } from '../infrastructure/prisma/inventory-prisma.repository';
+import { InventoryPgRepository } from '../infrastructure/db/inventory-pg.repository';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [DbModule],
   controllers: [InventoryController],
   providers: [
     InventoryService,
     {
       provide: INVENTORY_REPOSITORY,
-      useClass: InventoryPrismaRepository,
+      useClass: InventoryPgRepository,
     },
   ],
 })
