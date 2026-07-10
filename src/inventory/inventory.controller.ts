@@ -25,6 +25,12 @@ export class InventoryController {
     return this.inventoryService.findAll();
   }
 
+  @Get('/greet')
+  greet() {
+    this.logger.log('Endpoint test');
+    return 'HOLA DESDE EL NUEVO ENDPOINT!';
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     this.logger.log(`Fetching inventory item with id: ${id}`);
